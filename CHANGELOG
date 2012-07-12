@@ -1,0 +1,4 @@
+## 0.0.0
+
+* Initial release
+* Currently `merge_overlapping` is the only clustering strategy supported.
