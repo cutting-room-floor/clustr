@@ -4,6 +4,7 @@ BANNER = ./node_modules/.bin/banner
 
 dist/clustr.min.js:
 	cat src/clustr.js \
+		src/scale_factory.js \
 		src/merge_intersecting.js > dist/clustr.js
 	$(UGLIFYJS) dist/clustr.js > dist/clustr.min.js
 

@@ -63,13 +63,13 @@
                 });
 
                 map.addLayer(mapbox.markers()
-                    .factory(scale_factory(radii))
+                    .factory(clustr.scale_factory(radii))
                     .features(features));
 
                 map.extent(map.getLayerAt(1).extent());
 
                 map_cluster.addLayer(mapbox.markers()
-                    .factory(scale_factory(radii))
+                    .factory(clustr.scale_factory(radii))
                     .features(
                         clustr.merge_intersecting(features, radii, addPoints, map.zoom())));
 

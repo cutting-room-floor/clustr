@@ -1,8 +1,6 @@
 var scale_factory_cache = {};
 
-
-
-function scale_factory(getRadius, fillStyle, strokeStyle) {
+clustr.scale_factory = function(getRadius, fillStyle, strokeStyle) {
 
     return function(feature) {
         if (!getRadius) throw 'getRadius must be specified';
@@ -42,4 +40,4 @@ function scale_factory(getRadius, fillStyle, strokeStyle) {
         return el;
     };
 
-}
+};
