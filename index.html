@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>crime clusters</title>
+    <title>clustr</title>
     <script type='text/javascript'
-        src='/ext/markers.0.5.3.min.js'></script>
-    <script type='text/javascript'
-        src='/ext/markers.0.5.3.externals.js'></script>
-    <script type='text/javascript'
-        src='site/scale_factory.js'></script>
+        src='/ext/mapbox.0.4.3.min.js'></script>
     <script type='text/javascript'
         src='src/clustr.js'></script>
     <script type='text/javascript'
+        src='src/scale_factory.js'></script>
+    <script type='text/javascript'
         src='src/merge_intersecting.js'></script>
-    <link href='/ext/markers.0.5.3.css'
-        rel='stylesheet' type='text/css' />
     <style>
-        body { margin:0;font: 14px/20px 'Helvetica', 'Helvetica Neue'; background:#eee; }
+        body {
+            font: 14px/20px 'Helvetica', 'Helvetica Neue';
+            background:#eee;
+            width:640px;
+            margin:0 auto;
+        }
         .map {
-            width:320px;
-            height:300px;
-            border-right:1px solid #A63F74;
+            width:308px;
+            height:308px;
+            margin:5px;
+            border:1px solid #A63F74;
             float:left;
         }
         .controls {
@@ -31,51 +33,41 @@
     </style>
   </head>
   <body>
+    <h1>clustr</h1>
     <div class='map' id='map'></div>
     <div class='map' id='map-cluster'></div>
     <script type='text/javascript'>
-      var ml, features;
-      var map = new MM.Map('map');
-      var map_cluster = new MM.Map('map-cluster');
+      var map = new MM.Map('map', mapbox.layer().id('tmcw.map-bzuvyug3'));
+      var map_cluster = new MM.Map('map-cluster', mapbox.layer().id('tmcw.map-bzuvyug3'));
+
       var radii = function(f) {
           return clustr.area_to_radius(Math.round(+f.properties.Burglary * 0.05));
-      }
-      // Add b to a
+      };
+
       var addPoints = function(a, b) {
           a.properties.Burglary += b.properties.Burglary;
           return a;
-      }
-      function change(type) {
-            if (!type) {
-                ml.features(features);
-            } else {
-                ml.features(clustr[type](features, radii, addPoints, m.getZoom()));
-            }
-      }
-      wax.tilejson('http://a.tiles.mapbox.com/v3/tmcw.map-bzuvyug3.jsonp',
-        function(tj) {
-            map.addLayer(new wax.mm.connector(tj));
-            map_cluster.addLayer(new wax.mm.connector(tj));
-            mapbox.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
-                features = crimes.map(function(f) {
-                    f.properties.Burglary = +f.properties.Burglary;
-                    return f;
-                });
+      };
 
-                map.addLayer(mapbox.markers()
-                    .factory(clustr.scale_factory(radii))
-                    .features(features));
+      mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
+          features = crimes.map(function(f) {
+              f.properties.Burglary = +f.properties.Burglary;
+              return f;
+          });
 
-                map.extent(map.getLayerAt(1).extent());
+          map.addLayer(mapbox.markers.layer()
+              .factory(clustr.scale_factory(radii))
+              .features(features));
 
-                map_cluster.addLayer(mapbox.markers()
-                    .factory(clustr.scale_factory(radii))
-                    .features(
-                        clustr.merge_intersecting(features, radii, addPoints, map.zoom())));
+          map.extent(map.getLayerAt(1).extent());
 
-                map_cluster.extent(map.getLayerAt(1).extent());
-            });
-        });
+          map_cluster.addLayer(mapbox.markers.layer()
+              .factory(clustr.scale_factory(radii))
+              .features(
+                  clustr.merge_intersecting(features, radii, addPoints, map.zoom())));
+
+          map_cluster.extent(map.getLayerAt(1).extent());
+      });
     </script>
   </body>
 </html>
