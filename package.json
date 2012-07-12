@@ -8,7 +8,10 @@
     "url": "git@github.com:tmcw/clustr.git"
   },
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "jshint": "0.5.x",
+    "uglify-js": "1.0.x"
+  },
   "optionalDependencies": {},
   "engines": {
     "node": "*"
