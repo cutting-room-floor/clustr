@@ -11,6 +11,6 @@ which in turn is designed to work with [Modest Maps](http://github.com/modestmap
 
 # [Homepage](http://mapbox.com/clustr/)
 
-# [Documentation](https://github.com/mapbox/clustr/wiki/API)
+# [Documentation](https://github.com/mapbox/clustr/blob/gh-pages/API.md)
 
 Implementation adapted from [Dave Cole's prototype](https://github.com/dhcole)
