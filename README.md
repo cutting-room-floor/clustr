@@ -13,4 +13,5 @@ which in turn is designed to work with [Modest Maps](http://github.com/modestmap
 
 # [Documentation](https://github.com/mapbox/clustr/blob/gh-pages/API.md)
 
-Implementation adapted from [Dave Cole's prototype](https://github.com/dhcole)
+* Implementation of `merge_intersecting` is adapted from [Dave Cole's prototype](https://github.com/dhcole), algorithm
+  loosely based around [Gregor Aisch's suggestion](http://vis4.net/blog/posts/clean-your-symbol-maps/).
