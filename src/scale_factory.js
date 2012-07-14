@@ -1,9 +1,13 @@
+// This _requires_ a browser DOM to operate.
+
+if (typeof clustr === 'undefined') clustr = {};
 var scale_factory_cache = {};
 
 clustr.scale_factory = function(getRadius, fillStyle, strokeStyle) {
 
-    return function(feature) {
+    return function scale_factory(feature) {
         if (!getRadius) throw 'getRadius must be specified';
+        getRadius = clustr.functor(getRadius);
 
         var radius = getRadius(feature),
             diameter = radius * 2;

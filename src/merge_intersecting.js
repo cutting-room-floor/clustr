@@ -1,8 +1,10 @@
+if (typeof clustr === 'undefined') module = module.exports = clustr = {};
 // Original implementation by Dave Cole @dhcole
 // Formulation by Gregor Aisch
 // http://vis4.net/blog/posts/clean-your-symbol-maps/
 clustr.merge_intersecting = function(x, getRadius, addPoints, zoom) {
     var features = x.slice();
+    getRadius = clustr.functor(getRadius);
     for (var i = 0; i < features.length; i++) {
         for (var n = 0; n < features.length; n++) {
             if (i === n) continue;

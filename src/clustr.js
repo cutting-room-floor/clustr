@@ -1,4 +1,5 @@
-clustr = {};
+if (typeof clustr === 'undefined') clustr = {};
+if (typeof module !== 'undefined') module = module.exports = clustr;
 
 clustr.resolutions = (function() {
     var r = [];
@@ -32,4 +33,11 @@ clustr.dist = function dist(a, b) {
 clustr.area_to_radius = function(area) {
     var radius = Math.round(Math.sqrt(area / Math.PI));
     return radius;
+};
+
+clustr.functor = function(x) {
+    if (typeof x === 'function') return x;
+    return function() {
+        return x;
+    };
 };
