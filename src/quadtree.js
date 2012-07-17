@@ -59,10 +59,10 @@ quadtree = function(points) {
     function insertChild(n, p, x1, y1, x2, y2) {
         // Compute the split point, and the quadrant in which to insert p.
         var sx = (x1 + x2) * .5,
-        sy = (y1 + y2) * .5,
-        right = p.x >= sx,
-        bottom = p.y >= sy,
-        i = (bottom << 1) + right;
+            sy = (y1 + y2) * .5,
+            right = p.x >= sx,
+            bottom = p.y >= sy,
+            i = (bottom << 1) + right;
 
         // Recursively insert into the child node.
         n.leaf = false;

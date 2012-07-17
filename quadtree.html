@@ -57,13 +57,22 @@
               return f;
           });
 
-          map_cluster.addLayer(mapbox.markers.layer()
-              .factory(clustr.scale_factory(radii))
-              .features(
-                  clustr.fast_push(features, radii, 5)
-              ));
+          var ft = JSON.stringify(features);
+
+          var ml = mapbox.markers.layer()
+                .factory(clustr.scale_factory(radii));
+          map_cluster.addLayer(ml);
+
+          function draw() {
+                  ml.features(
+                      clustr.fast_push(JSON.parse(ft), radii, map_cluster.zoom() || 5)
+                  );
+          }
+
+          draw();
 
           map_cluster.extent(map_cluster.getLayerAt(1).extent());
+          map_cluster.addCallback('zoomed', draw);
     });
 
     mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
