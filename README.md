@@ -15,3 +15,4 @@ which in turn is designed to work with [Modest Maps](http://github.com/modestmap
 
 * Implementation of `merge_intersecting` is adapted from [Dave Cole's prototype](https://github.com/dhcole), algorithm
   loosely based around [Gregor Aisch's suggestion](http://vis4.net/blog/posts/clean-your-symbol-maps/).
+* [quadtree from d3js](http://d3js.org/)
