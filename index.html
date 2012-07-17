@@ -10,6 +10,8 @@
         src='src/scale_factory.js'></script>
     <script type='text/javascript'
         src='src/merge_intersecting.js'></script>
+    <script type='text/javascript'
+        src='src/push_intersecting.js'></script>
     <style>
         body {
             font: 14px/20px 'Helvetica', 'Helvetica Neue';
@@ -37,8 +39,8 @@
     <div class='map' id='map'></div>
     <div class='map' id='map-cluster'></div>
     <script type='text/javascript'>
-      var map = new MM.Map('map', mapbox.layer().id('tmcw.map-bzuvyug3'));
-      var map_cluster = new MM.Map('map-cluster', mapbox.layer().id('tmcw.map-bzuvyug3'));
+      var map = new MM.Map('map' , mapbox.layer().id('tmcw.map-bzuvyug3'));
+      var map_cluster = new MM.Map('map-cluster' /*, mapbox.layer().id('tmcw.map-bzuvyug3') */);
 
       var radii = function(f) {
           return clustr.area_to_radius(Math.round(+f.properties.Burglary * 0.05));
@@ -57,16 +59,18 @@
 
           map.addLayer(mapbox.markers.layer()
               .factory(clustr.scale_factory(radii))
-              .features(features));
+              .features(
+                  clustr.push_intersecting(features, radii, 5)
+              ));
 
           map.extent(map.getLayerAt(1).extent());
 
-          map_cluster.addLayer(mapbox.markers.layer()
-              .factory(clustr.scale_factory(radii))
-              .features(
-                  clustr.merge_intersecting(features, radii, addPoints, map.zoom())));
+          // map_cluster.addLayer(mapbox.markers.layer()
+          //     .factory(clustr.scale_factory(radii))
+          //     .features(
+          //         clustr.merge_intersecting(features, radii, addPoints, map.zoom())));
 
-          map_cluster.extent(map.getLayerAt(1).extent());
+          // map_cluster.extent(map.getLayerAt(0).extent());
       });
     </script>
   </body>

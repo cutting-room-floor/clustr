@@ -9,7 +9,7 @@
     <script type='text/javascript'
         src='src/scale_factory.js'></script>
     <script type='text/javascript'
-        src='src/fast_merge.js'></script>
+        src='src/fast_push.js'></script>
     <script type='text/javascript'
         src='src/quadtree.js'></script>
     <style>
@@ -60,7 +60,7 @@
           map_cluster.addLayer(mapbox.markers.layer()
               .factory(clustr.scale_factory(radii))
               .features(
-                  clustr.fast_merge(features, radii, addPoints, 5)
+                  clustr.fast_push(features, radii, 5)
               ));
 
           map_cluster.extent(map_cluster.getLayerAt(1).extent());
