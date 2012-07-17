@@ -21,9 +21,19 @@ clustr.forwardMercator = function(feature) {
     return { x: x, y: y };
 };
 
+clustr.backwardMercator = function(feature) {
+    var R2D = 180 / Math.PI,
+        A = 6378137;
+
+    return [
+        (feature.x * R2D / A),
+        ((Math.PI*0.5) - 2.0 * Math.atan(Math.exp(-feature.y / A))) * R2D
+    ];
+};
+
 clustr.dist = function dist(a, b) {
-    var c = clustr.forwardMercator(a),
-        d = clustr.forwardMercator(b);
+    var c = a.fm || (a.fm = clustr.forwardMercator(a)),
+        d = b.fm || (b.fm = clustr.forwardMercator(b));
 
     return Math.sqrt(
         Math.pow(c.x - d.x, 2) +
