@@ -18,7 +18,8 @@ Clustr provides several utilities that address its main trick - symbolizer-frien
 
 ### clustr.resolutions
 
-An array of resolutions indexed by zoom levels. The resolutions are in meters / pixel, so the most common use is to divide the distance between points by the resolution in order to determine the number of pixels between the features.
+An array of resolutions indexed by zoom levels.
+The resolutions are in meters / pixel, so the most common use is to divide the distance between points by the resolution in order to determine the number of pixels between the features.
 
 ### clustr.dist(a, b)
 
@@ -31,3 +32,13 @@ Calculates the radius of a circle of a certain area. Scaled points should be sca
 ### clustr.functor(value)
 
 This is a simple function that takes an argument that is either a function or a value. If the argument is a function, it returns the value - otherwise it returns a function returning the value.
+
+### clustr.centroid(features)
+
+Derive a centroid from an array of GeoJSON features.
+
+**Arguments:**
+
+* `features` must be non-zero array of GeoJSON features with coordinates
+
+**Returns** a two-element array that can be used as the `geometry.coordinates` of a derived point feature.
