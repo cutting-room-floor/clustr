@@ -2,14 +2,17 @@
 <html>
   <head>
     <title>clustr</title>
-    <script type='text/javascript'
-        src='ext/mapbox.0.4.3.min.js'></script>
+    <script src='http://js.mapbox.com/mapbox.js/v0.6.0-dev/mapbox.js'></script>
+    <link href='http://js.mapbox.com/mapbox.js/v0.6.0-dev/mapbox.css' rel='stylesheet' />
+    <script src='markers.js'></script>
     <script type='text/javascript'
         src='src/clustr.js'></script>
     <script type='text/javascript'
         src='src/scale_factory.js'></script>
     <script type='text/javascript'
         src='src/simple_facet.js'></script>
+    <script type='text/javascript'
+        src='src/animate_transition.js'></script>
     <style>
         body {
             font: 14px/20px 'Helvetica', 'Helvetica Neue';
@@ -18,7 +21,7 @@
         }
         .map {
             width:608px;
-            height:608px;
+            height:408px;
             margin:5px;
             border:1px solid #A63F74;
             float:left;
@@ -35,9 +38,10 @@
     <h1>clustr</h1>
     <div class='map' id='map'></div>
     <div class='map' id='map-cluster'></div>
+    <button onclick='facet()'>facet</button>
     <script type='text/javascript'>
-      var map = new MM.Map('map' , mapbox.layer().id('tmcw.map-bzuvyug3'));
-      var map_cluster = new MM.Map('map-cluster' , mapbox.layer().id('tmcw.map-bzuvyug3'));
+      var map = new mapbox.map('map' , mapbox.layer().id('tmcw.map-bzuvyug3'));
+      var map_cluster = new mapbox.map('map-cluster' , mapbox.layer().id('tmcw.map-bzuvyug3'));
 
       var radii = function(f) {
           return clustr.area_to_radius(Math.round(+f.properties.Burglary * 0.05));
@@ -48,7 +52,11 @@
           return a;
       };
 
-      mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
+      reqwest({
+        url: 'data/texas_crime.csv',
+        type: 'text',
+        success: function(resp) {
+            var crimes = mapbox.markers.csv_to_geojson(resp.response);
           features = crimes.map(function(f) {
               f.properties.Burglary = +f.properties.Burglary;
               return f;
@@ -60,33 +68,55 @@
 
           map_cluster.addLayer(ml);
           map_cluster.extent(map_cluster.getLayerAt(1).extent());
-    });
+      }
+      });
 
-    mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
+
+      reqwest({
+        url: 'data/texas_crime.csv',
+        type: 'text',
+        success: function(resp) {
+            var crimes = mapbox.markers.csv_to_geojson(resp.response);
         features = crimes.map(function(f) {
             f.properties.Burglary = +f.properties.Burglary;
             return f;
         });
 
-        map.addLayer(mapbox.markers.layer()
-            .factory(clustr.scale_factory(radii))
-            .features(clustr.simple_facet(features, 'County', function(features) {
+        var faceted_features = clustr.simple_facet(features, 'County', function(features) {
                 var sum = 0;
                 for (var i = 0; i < features.length; i++) {
                     sum += features[i].properties.Burglary;
                 }
                 return {
-                    properties: {
-                        Burglary: sum
-                    },
-                    geometry: {
-                        coordinates: clustr.centroid(features)
-                    }
+                    properties: { Burglary: sum, County: features[0].properties.County },
+                    geometry: { coordinates: clustr.centroid(features) }
                 };
-        })));
+        });
+
+        var sav = JSON.stringify(faceted_features);
+
+        map.addLayer(mapbox.markers.layer()
+            .factory(clustr.scale_factory(radii))
+            .features(features).id(function(x) {
+                return x.properties.State + x.properties.City;
+            }));
+
+        window.facet = function() {
+            var to = 1;
+            var anim = window.setInterval(function() {
+                map.getLayerAt(1).features(clustr.animate_transition(faceted_features, features, 'County', to));
+                if (to < 0) {
+                    window.clearInterval(anim);
+                    map.getLayerAt(1).id(null);
+                    map.getLayerAt(1).features(faceted_features);
+                }
+                to -= 0.1;
+            }, 1);
+        };
 
         map.extent(map.getLayerAt(1).extent());
-    });
+      }
+      });
     </script>
   </body>
 </html>

@@ -21,7 +21,6 @@ clustr.scale_factory = function(getRadius, fillStyle, strokeStyle) {
 
         var radius = getRadius(feature),
             diameter = radius * 2;
-        if (diameter === 0) return null;
 
         if (!scale_factory_cache[radius]) {
             var c = document.createElement('canvas');
