@@ -52,6 +52,10 @@
           return a;
       };
 
+      function bSort(b, a) {
+          return a.properties.Burglary - b.properties.Burglary;
+      }
+
       reqwest({
         url: 'data/texas_crime.csv',
         type: 'text',
@@ -63,6 +67,7 @@
           });
 
           var ml = mapbox.markers.layer()
+              .sort(bSort)
               .factory(clustr.scale_factory(radii))
               .features(features);
 
@@ -96,6 +101,7 @@
         var sav = JSON.stringify(faceted_features);
 
         map.addLayer(mapbox.markers.layer()
+            .sort(bSort)
             .factory(clustr.scale_factory(radii))
             .features(features).id(function(x) {
                 return x.properties.State + x.properties.City;
