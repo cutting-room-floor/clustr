@@ -51,3 +51,14 @@ clustr.functor = function(x) {
         return x;
     };
 };
+
+clustr.centroid = function(features) {
+    var sX = 0, sY = 0, sum = 0;
+    for (var i = 0; i < features.length; i++) {
+        sX += features[i].geometry.coordinates[0];
+        sY += features[i].geometry.coordinates[1];
+    }
+    return [
+        sX / features.length,
+        sY / features.length];
+};

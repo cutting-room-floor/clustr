@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>clustr</title>
+    <script type='text/javascript'
+        src='ext/mapbox.0.4.3.min.js'></script>
+    <script type='text/javascript'
+        src='src/clustr.js'></script>
+    <script type='text/javascript'
+        src='src/scale_factory.js'></script>
+    <script type='text/javascript'
+        src='src/simple_facet.js'></script>
+    <style>
+        body {
+            font: 14px/20px 'Helvetica', 'Helvetica Neue';
+            background:#eee;
+            margin:0 auto;
+        }
+        .map {
+            width:608px;
+            height:608px;
+            margin:5px;
+            border:1px solid #A63F74;
+            float:left;
+        }
+        .controls {
+            position:absolute;
+            top:400px;
+            padding:10px;
+            width:640px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>clustr</h1>
+    <div class='map' id='map'></div>
+    <div class='map' id='map-cluster'></div>
+    <script type='text/javascript'>
+      var map = new MM.Map('map' , mapbox.layer().id('tmcw.map-bzuvyug3'));
+      var map_cluster = new MM.Map('map-cluster' , mapbox.layer().id('tmcw.map-bzuvyug3'));
+
+      var radii = function(f) {
+          return clustr.area_to_radius(Math.round(+f.properties.Burglary * 0.05));
+      };
+
+      var addPoints = function(a, b) {
+          a.properties.Burglary += b.properties.Burglary;
+          return a;
+      };
+
+      mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
+          features = crimes.map(function(f) {
+              f.properties.Burglary = +f.properties.Burglary;
+              return f;
+          });
+
+          var ml = mapbox.markers.layer()
+              .factory(clustr.scale_factory(radii))
+              .features(features);
+
+          map_cluster.addLayer(ml);
+          map_cluster.extent(map_cluster.getLayerAt(1).extent());
+    });
+
+    mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
+        features = crimes.map(function(f) {
+            f.properties.Burglary = +f.properties.Burglary;
+            return f;
+        });
+
+        map.addLayer(mapbox.markers.layer()
+            .factory(clustr.scale_factory(radii))
+            .features(clustr.simple_facet(features, 'County', function(features) {
+                var sum = 0;
+                for (var i = 0; i < features.length; i++) {
+                    sum += features[i].properties.Burglary;
+                }
+                return {
+                    properties: {
+                        Burglary: sum
+                    },
+                    geometry: {
+                        coordinates: clustr.centroid(features)
+                    }
+                };
+        })));
+
+        map.extent(map.getLayerAt(1).extent());
+    });
+    </script>
+  </body>
+</html>
