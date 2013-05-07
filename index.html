@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>clustr</title>
-    <script type='text/javascript'
-        src='ext/mapbox.0.4.3.min.js'></script>
-    <script type='text/javascript'
-        src='src/clustr.js'></script>
-    <script type='text/javascript'
-        src='src/scale_factory.js'></script>
-    <script type='text/javascript'
-        src='src/merge_intersecting.js'></script>
-    <script type='text/javascript'
-        src='src/push_intersecting.js'></script>
+    <title>Clustr | MapBox</title>
+    <script src='http://api.tiles.mapbox.com/mapbox.js/v0.6.6/mapbox.js'></script>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+    <script src='src/clustr.js'></script>
+    <script src='src/scale_factory.js'></script>
+    <script src='src/merge_intersecting.js'></script>
+    <script src='src/push_intersecting.js'></script>
     <style>
         body {
             font: 14px/20px 'Helvetica', 'Helvetica Neue';
@@ -26,52 +22,40 @@
             border:1px solid #A63F74;
             float:left;
         }
-        .controls {
-            position:absolute;
-            top:400px;
-            padding:10px;
-            width:640px;
-        }
     </style>
   </head>
   <body>
     <h1>clustr</h1>
-    <div class='map' id='map'></div>
-    <div class='map' id='map-cluster'></div>
-    <script type='text/javascript'>
-      var map = new MM.Map('map' , mapbox.layer().id('tmcw.map-bzuvyug3'));
-      var map_cluster = new MM.Map('map-cluster' /*, mapbox.layer().id('tmcw.map-bzuvyug3') */);
+    <div class='map' id='map-push-example'></div>
+    <div class='map' id='map-merge-example'></div>
+    <script>
+        var mapPush = mapbox.map('map-push-example').addLayer(mapbox.layer().id('tmcw.map-bzuvyug3'));
+        var mapMerge = mapbox.map('map-merge-example').addLayer(mapbox.layer().id('tmcw.map-bzuvyug3'));
 
-      var radii = function(f) {
+        var radii = function(f) {
           return clustr.area_to_radius(Math.round(+f.properties.Burglary * 0.05));
-      };
+        };
 
-      var addPoints = function(a, b) {
+        var addPoints = function(a, b) {
           a.properties.Burglary += b.properties.Burglary;
           return a;
-      };
+        };
 
-      mapbox.markers.csv_url_to_geojson('data/texas_crime.csv', function(crimes) {
-          features = crimes.map(function(f) {
-              f.properties.Burglary = +f.properties.Burglary;
-              return f;
-          });
+        $.get('data/texas_crime.csv', function(data) {
+          var features = mapbox.markers.csv_to_geojson(data);
+          var pushMarkers = mapbox.markers.layer().factory(clustr.scale_factory(radii)).features(
+            clustr.push_intersecting(features, radii, 5)
+          );
+          mapPush.addLayer(pushMarkers);
+          mapPush.extent(pushMarkers.extent());
 
-          map.addLayer(mapbox.markers.layer()
-              .factory(clustr.scale_factory(radii))
-              .features(
-                  clustr.push_intersecting(features, radii, 5)
-              ));
+          var mergeMarkers = mapbox.markers.layer().factory(clustr.scale_factory(radii)).features(
+            clustr.merge_intersecting(features, radii, addPoints, mapPush.zoom())
+            );
 
-          map.extent(map.getLayerAt(1).extent());
-
-          // map_cluster.addLayer(mapbox.markers.layer()
-          //     .factory(clustr.scale_factory(radii))
-          //     .features(
-          //         clustr.merge_intersecting(features, radii, addPoints, map.zoom())));
-
-          // map_cluster.extent(map.getLayerAt(0).extent());
-      });
+          mapMerge.addLayer(mergeMarkers);
+          mapMerge.extent(mergeMarkers.extent());
+        });
     </script>
   </body>
 </html>
